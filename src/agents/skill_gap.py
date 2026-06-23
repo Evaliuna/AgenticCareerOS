@@ -1,6 +1,7 @@
 from google import genai
 from google.genai import types
 from src.tools.skill_gap_tool import SkillGapTool
+from src.agents.api_utils import generate_content_with_retry
 import os
 
 class SkillGapAgent:
@@ -37,37 +38,42 @@ class SkillGapAgent:
             ]
         )
         
-        response = self.client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                tools=[gemini_tool],
-                tool_config=types.ToolConfig(
-                    function_calling_config=types.FunctionCallingConfig(
-                        mode="ANY",
-                        allowed_function_names=[self.tool.name]
-                    )
-                ),
-                temperature=0.3, # Slight variance to generate diverse required industry skills
+        try:
+            response = generate_content_with_retry(
+                client=self.client,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    tools=[gemini_tool],
+                    tool_config=types.ToolConfig(
+                        function_calling_config=types.FunctionCallingConfig(
+                            mode="ANY",
+                            allowed_function_names=[self.tool.name]
+                        )
+                    ),
+                    temperature=0.3, # Slight variance to generate diverse required industry skills
+                )
             )
-        )
-        
-        if response.function_calls:
-            for fn_call in response.function_calls:
-                if fn_call.name == self.tool.name:
-                    args = fn_call.args
-                    c_skills = args.get("current_skills", [])
-                    r_skills = args.get("required_skills", [])
-                    
-                    # Compute logic purely using the deterministic MCP tool block
-                    gap_analysis = self.tool.execute(current_skills=c_skills, required_skills=r_skills)
-                    
-                    return {
-                        "industry_required_skills": r_skills,
-                        "gap_analysis": gap_analysis
-                    }
-                    
-        return {
-            "error": "Failed to invoke gap calculation tool.",
-            "raw_text": response.text
-        }
+            
+            if response.function_calls:
+                for fn_call in response.function_calls:
+                    if fn_call.name == self.tool.name:
+                        args = fn_call.args
+                        c_skills = args.get("current_skills", [])
+                        r_skills = args.get("required_skills", [])
+                        
+                        # Compute logic purely using the deterministic MCP tool block
+                        gap_analysis = self.tool.execute(current_skills=c_skills, required_skills=r_skills)
+                        
+                        return {
+                            "industry_required_skills": r_skills,
+                            "gap_analysis": gap_analysis
+                        }
+                        
+            return {
+                "error": "Failed to invoke gap calculation tool.",
+                "raw_text": response.text
+            }
+        except Exception as e:
+            return {
+                "error": f"Agent failed due to API error: {str(e)}",
+            }

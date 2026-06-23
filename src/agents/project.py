@@ -1,6 +1,7 @@
 from google import genai
 from google.genai import types
 from src.tools.project_tool import ProjectTool
+from src.agents.api_utils import generate_content_with_retry
 import os
 
 class ProjectRecommendationAgent:
@@ -32,8 +33,8 @@ class ProjectRecommendationAgent:
         )
         
         try:
-            response = self.client.models.generate_content(
-                model='gemini-2.5-flash',
+            response = generate_content_with_retry(
+                client=self.client,
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     tools=[gemini_tool],
@@ -53,7 +54,7 @@ class ProjectRecommendationAgent:
                         return self.tool.execute(**fn_call.args)
                         
         except Exception as e:
-            return {"error": str(e)}
+            return {"error": f"Agent failed due to API error: {str(e)}"}
 
         return {
             "error": "Failed to generate project specification."

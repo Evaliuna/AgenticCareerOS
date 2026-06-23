@@ -230,7 +230,8 @@ with tab_profile:
                     status.update(label="Analysis Pipeline Complete!", state="complete", expanded=False)
                     st.rerun()
                 except Exception as e:
-                    status.update(label=f"Pipeline Execution Failed: {str(e)}", state="error", expanded=True)
+                    status.update(label="Analysis Pipeline Interrupted", state="error", expanded=True)
+                    st.warning(f"The pipeline could not complete successfully:\\n\\n{str(e)}")
 
 # Render Analysis Results if available
 if st.session_state.get("results"):

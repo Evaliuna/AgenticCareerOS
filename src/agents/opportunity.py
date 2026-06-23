@@ -1,6 +1,7 @@
 from google import genai
 from google.genai import types
 from pydantic import BaseModel
+from src.agents.api_utils import generate_content_with_retry
 import os
 
 class OpportunityItem(BaseModel):
@@ -36,8 +37,8 @@ class OpportunityAgent:
         )
         
         try:
-            response = self.client.models.generate_content(
-                model='gemini-2.5-flash',
+            response = generate_content_with_retry(
+                client=self.client,
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -51,5 +52,5 @@ class OpportunityAgent:
             data = json.loads(response.text)
             return data
         except Exception as e:
-            return {"error": str(e)}
+            return {"error": f"Agent failed due to API error: {str(e)}"}
 

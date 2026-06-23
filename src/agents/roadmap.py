@@ -1,6 +1,7 @@
 from google import genai
 from google.genai import types
 from src.tools.roadmap_tool import RoadmapGenerationTool
+from src.agents.api_utils import generate_content_with_retry
 import os
 
 class LearningRoadmapAgent:
@@ -31,8 +32,8 @@ class LearningRoadmapAgent:
         )
         
         try:
-            response = self.client.models.generate_content(
-                model='gemini-2.5-flash',
+            response = generate_content_with_retry(
+                client=self.client,
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     tools=[gemini_tool],
@@ -54,7 +55,7 @@ class LearningRoadmapAgent:
                         tf = int(args.get("time_frame_weeks", time_frame_weeks))
                         return self.tool.execute(missing_skills=ms, time_frame_weeks=tf)
         except Exception as e:
-            return {"error": str(e)}
+            return {"error": f"Agent failed due to API error: {str(e)}"}
 
         return {
             "error": "Failed to map roadmap via tool extraction."
