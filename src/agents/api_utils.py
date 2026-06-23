@@ -5,15 +5,15 @@ logger = logging.getLogger("api_retries")
 logger.setLevel(logging.WARNING)
 
 # Primary and fallback models
-PRIMARY_MODEL = "gemini-2.0-flash"
-FALLBACK_MODEL = "gemini-2.5-flash"
+PRIMARY_MODEL = "gemini-3.5-flash"
+FALLBACK_MODEL = "gemini-3.5-flash"
 
 def generate_content_with_retry(client, contents, config, max_retries=3):
     """
     Executes a Gemini API call with retries, exponential backoff, and model fallback.
     """
-    delays = [2, 4, 8]
-    models_to_try = [PRIMARY_MODEL, FALLBACK_MODEL]
+    delays = [15, 30, 45]
+    models_to_try = [PRIMARY_MODEL]
     
     last_exception = None
     
@@ -34,7 +34,7 @@ def generate_content_with_retry(client, contents, config, max_retries=3):
                 
                 if try_count < max_retries:
                     # Exponential backoff
-                    delay = delays[try_count] if try_count < len(delays) else 8
+                    delay = delays[try_count] if try_count < len(delays) else 60
                     logger.info(f"Retrying in {delay} seconds...")
                     time.sleep(delay)
                 
