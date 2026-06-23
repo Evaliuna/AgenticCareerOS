@@ -1,0 +1,2 @@
+# AgenticCareerOS
+AgenticCareerOS is a multi-agent AI system that acts as a personalized career growth navigator. It analyzes user skills, detects skill gaps, generates learning roadmaps, recommends projects, and discovers real-world opportunities using an MCP-based agent architecture powered by Google Gemini. The system demonstrates a modular multi-agent design with memory, tool usage, and adaptive learning workflows.
