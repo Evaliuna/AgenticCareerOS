@@ -117,18 +117,41 @@ with st.sidebar:
     api_key_env = os.environ.get("GEMINI_API_KEY", "")
     st.subheader("🔑 API Configuration")
     
-    api_key = st.text_input(
-        "Gemini API Key", 
-        value=api_key_env, 
-        type="password",
-        help="Required for standard agent execution."
-    )
+    # 1. Try to get API key from environment
+    api_key = os.environ.get("GEMINI_API_KEY", "")
     
+    # 2. Try Streamlit secrets as fallback if not in env
+    if not api_key:
+        try:
+            api_key = st.secrets["GEMINI_API_KEY"]
+        except Exception:
+            pass
+            
     if api_key:
         os.environ["GEMINI_API_KEY"] = api_key
-        st.success("API Key loaded.", icon="✅")
+        st.success("API Key loaded securely.", icon="✅")
+        # Give option to change it if needed
+        with st.expander("Update API Key"):
+            new_key = st.text_input("New Gemini API Key", type="password")
+            if new_key and st.button("Save New Key"):
+                os.environ["GEMINI_API_KEY"] = new_key
+                with open(".env", "w") as f:
+                    f.write(f"GEMINI_API_KEY={new_key}\n")
+                st.rerun()
     else:
-        st.warning("Please provide a Gemini API key.", icon="⚠️")
+        st.warning("No API Key found. Enter one below.", icon="⚠️")
+        new_key = st.text_input(
+            "Gemini API Key", 
+            type="password",
+            help="Your key will be securely saved to a local .env file so you only have to do this once."
+        )
+        if new_key:
+            os.environ["GEMINI_API_KEY"] = new_key
+            # Save to .env automatically
+            with open(".env", "a") as f:
+                f.write(f"\nGEMINI_API_KEY={new_key}\n")
+            st.success("API Key saved to .env file!", icon="✅")
+            st.rerun()
         
     st.divider()
     st.subheader("⚙️ Pipeline Settings")

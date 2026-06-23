@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "python3 -m pip install -r requirements.txt && python3 -m streamlit run src/app.py --server.port 3000 --server.address 0.0.0.0",
-    "build": "python3 -m pip install -r requirements.txt",
+    "dev": "python3 -m streamlit run src/app.py --server.port 3000 --server.address 0.0.0.0",
+    "build": "echo 'No node build step required'",
     "start": "python3 -m streamlit run src/app.py --server.port 3000 --server.address 0.0.0.0",
     "preview": "python3 -m streamlit run src/app.py --server.port 3000 --server.address 0.0.0.0",
     "clean": "rm -rf dist server.js",
