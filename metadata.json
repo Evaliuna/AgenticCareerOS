@@ -1,6 +1,0 @@
-{
-  "name": "AI Career Growth Navigator",
-  "description": "Multi-agent career growth system with skill gap analysis, personalized roadmaps, project recommendations, and opportunity discovery.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
