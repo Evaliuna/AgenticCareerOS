@@ -5,8 +5,8 @@ logger = logging.getLogger("api_retries")
 logger.setLevel(logging.WARNING)
 
 # Primary and fallback models
-PRIMARY_MODEL = "gemini-2.5-flash"
-FALLBACK_MODEL = "gemini-1.5-flash"
+PRIMARY_MODEL = "gemini-2.0-flash"
+FALLBACK_MODEL = "gemini-2.5-flash"
 
 def generate_content_with_retry(client, contents, config, max_retries=3):
     """
