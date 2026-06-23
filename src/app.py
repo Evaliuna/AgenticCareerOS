@@ -154,6 +154,10 @@ if not api_key:
     except Exception:
         pass
 
+# Clean the key in case it was passed with quotes or spaces from the secrets panel
+if api_key:
+    api_key = api_key.strip(' "\'')
+
 if not api_key:
     st.error("Developer Warning: GEMINI_API_KEY environment variable is missing. The application will not function correctly.", icon="🚨")
 
