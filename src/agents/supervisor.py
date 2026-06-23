@@ -18,7 +18,7 @@ class Orchestrator:
         self.project_agent = ProjectRecommendationAgent(api_key)
         self.memory_agent = MemoryAgent()
 
-    def run_career_analysis(self, raw_skills, goal):
+    def run_career_analysis(self, raw_skills, goal, weeks_timeframe=4):
         """Executes the full agentic data workflow cleanly."""
         
         # 1. Profile Agent execution
@@ -30,7 +30,7 @@ class Orchestrator:
         missing_skills = gap_res.get("gap_analysis", {}).get("missing_skills", [])
         
         # 3. Actionable Generation (Parallel conceptual targets)
-        roadmap_res = self.roadmap_agent.generate_roadmap(missing_skills, 4)
+        roadmap_res = self.roadmap_agent.generate_roadmap(missing_skills, weeks_timeframe)
         project_res = self.project_agent.recommend(missing_skills, goal)
         opp_res = self.opportunity_agent.discover(missing_skills, goal)
         
